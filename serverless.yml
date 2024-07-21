@@ -1,0 +1,41 @@
+org: thanhtrieussr
+service: inventory-management-backend
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  ecr:
+    images:
+      inventorymanagement: 992382388627.dkr.ecr.us-east-1.amazonaws.com/inventory-management-backend:latest
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:DeleteItem
+          Resource: "*"
+
+functions:
+  app:
+    name: ${self:service}-${opt:stage, self:provider.stage}-app
+    image:
+      name: inventorymanagement
+      command: ["app.main.lambda_handler"]
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true
+
+plugins:
+  - serverless-dotenv-plugin
+
+custom:
+  dotenv:
+    path: .env
