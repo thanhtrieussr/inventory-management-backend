@@ -1,10 +1,14 @@
-# models.py
+# app/models.py
+# Author: Thanh Trieu
+# Description: Contains SQLAlchemy ORM models for the application, including Product, Order, and OrderItem.
+
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
+
 from .database import Base
 
-
 class Product(Base):
+    """Model representing a product in the inventory."""
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
@@ -13,15 +17,15 @@ class Product(Base):
     stock = Column(Integer)
     image_url = Column(String)
 
-
 class Order(Base):
+    """Model representing an order placed by a customer."""
     __tablename__ = 'orders'
     id = Column(Integer, primary_key=True, index=True)
     total_amount = Column(Float)
     items = relationship("OrderItem", back_populates="order")
 
-
 class OrderItem(Base):
+    """Model representing an item in an order."""
     __tablename__ = 'order_items'
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey('orders.id'))

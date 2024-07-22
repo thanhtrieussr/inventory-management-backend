@@ -1,10 +1,12 @@
-fastapi~=0.111.1
-uvicorn
-sqlalchemy~=2.0.31
-pydantic~=2.8.2
-boto3~=1.34.145
-pytest
-requests  # For testing
-psycopg2-binary
-python-dotenv~=1.0.1
-botocore~=1.34.145
+boto3  # AWS SDK for Python (Boto3)
+botocore  # Low-level, data-driven core of boto3 (included to ensure compatibility with boto3)
+fastapi~=0.111.1  # FastAPI framework for building APIs
+mangum  # ASGI adapter for AWS Lambda
+psycopg2-binary  # PostgreSQL database adapter for Python
+pydantic  # Data validation and settings management using Python type annotations
+pytest  # Testing framework
+python-dotenv  # For reading environment variables from a .env file
+python-jose  # For JWT operations (JSON Web Tokens)
+requests  # For making HTTP requests (used in testing)
+sqlalchemy~=2.0.31  # SQL toolkit and ORM
+uvicorn  # ASGI server for FastAPI

@@ -1,7 +1,9 @@
-# schemas.py
-from typing import List
-from pydantic import BaseModel
+# app/schemas.py
+# Author: Thanh Trieu
+# Description: Defines Pydantic schemas for data validation and serialization, including Product, Order, and OrderItem.
 
+from typing import List, Optional
+from pydantic import BaseModel
 
 class ProductBase(BaseModel):
     name: str
@@ -9,22 +11,18 @@ class ProductBase(BaseModel):
     price: float
     stock: int
 
-
 class ProductCreate(ProductBase):
     pass
-
 
 class ProductUpdate(ProductBase):
     pass
 
-
 class Product(ProductBase):
     id: int
-    image_url: str
+    image_url: Optional[str] = None  # Make image_url optional
 
     class Config:
         orm_mode = True
-
 
 class Inventory(BaseModel):
     product_id: int
@@ -33,15 +31,12 @@ class Inventory(BaseModel):
     class Config:
         orm_mode = True
 
-
 class OrderItemBase(BaseModel):
     product_id: int
     quantity: int
 
-
 class OrderItemCreate(OrderItemBase):
     pass
-
 
 class OrderItem(OrderItemBase):
     id: int
@@ -50,14 +45,11 @@ class OrderItem(OrderItemBase):
     class Config:
         orm_mode = True
 
-
 class OrderBase(BaseModel):
     total_amount: float
 
-
 class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
-
 
 class Order(OrderBase):
     id: int

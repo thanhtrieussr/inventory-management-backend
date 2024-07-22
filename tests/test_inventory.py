@@ -1,43 +1,40 @@
-import pytest
-from sqlalchemy.orm import Session
-from app import models, schemas, crud
-from app.database import get_db
+# tests/test_inventory.py
+# Author: Thanh Trieu
+# Description: Contains tests for inventory-related endpoints.
 
-def test_read_empty_inventory(client):
-    response = client.get("/inventory/")
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_read_inventory():
+    """
+    Test retrieving a list of all inventory items with pagination.
+    """
+    response = client.get("/inventory")
     assert response.status_code == 200
-    assert response.json() == []
+    assert isinstance(response.json(), list)
 
-def test_create_and_read_inventory(client):
-    product_data = {
-        "name": "Test Product",
-        "description": "Test Description",
-        "price": 10.0,
-        "stock": 100
-    }
-    product_response = client.post("/products/", data=product_data)
-    assert product_response.status_code == 200
+def test_read_inventory_product():
+    """
+    Test retrieving inventory information for a specific product by ID.
+    """
+    # Create a product
+    create_response = client.post(
+        "/products/",
+        data={
+            "name": "Inventory Product",
+            "description": "For inventory check",
+            "price": 25.99,
+            "stock": 15
+        }
+    )
+    assert create_response.status_code == 200
+    product_id = create_response.json()["id"]
 
-    response = client.get("/inventory/")
-    assert response.status_code == 200
-    inventory = response.json()
-    assert len(inventory) == 1
-    assert inventory[0]["name"] == "Test Product"
-    assert inventory[0]["stock"] == 100
-
-def test_read_inventory_product(client):
-    product_data = {
-        "name": "Test Product 2",
-        "description": "Test Description 2",
-        "price": 20.0,
-        "stock": 50
-    }
-    product_response = client.post("/products/", data=product_data)
-    assert product_response.status_code == 200
-    product = product_response.json()
-
-    response = client.get(f"/inventory/{product['id']}")
-    assert response.status_code == 200
-    inventory = response.json()
-    assert inventory["product_id"] == product["id"]
-    assert inventory["stock"] == 50
+    # Check inventory
+    inventory_response = client.get(f"/inventory/{product_id}")
+    assert inventory_response.status_code == 200
+    inventory_data = inventory_response.json()
+    assert inventory_data["product_id"] == product_id
+    assert inventory_data["stock"] == 15

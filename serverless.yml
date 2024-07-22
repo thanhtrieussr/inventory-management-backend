@@ -5,9 +5,16 @@ provider:
   name: aws
   stage: ${opt:stage, 'dev'}
   region: us-east-1
+  environment:
+    SQLALCHEMY_DATABASE_URL: ${env:SQLALCHEMY_DATABASE_URL}
+    POSTGRES_USER: ${env:POSTGRES_USER}
+    POSTGRES_PASSWORD: ${env:POSTGRES_PASSWORD}
+    POSTGRES_DB: ${env:POSTGRES_DB}
+  deploymentBucket:
+    name: inventory-management-backend
   ecr:
     images:
-      inventorymanagement: 992382388627.dkr.ecr.us-east-1.amazonaws.com/inventory-management-backend:latest
+      inventory-management-backend: 992382388627.dkr.ecr.us-east-1.amazonaws.com/inventory-management-backend:latest
   iam:
     role:
       statements:
@@ -19,14 +26,26 @@ provider:
             - dynamodb:Query
             - dynamodb:Scan
             - dynamodb:DeleteItem
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
           Resource: "*"
+  vpc:
+    securityGroupIds:
+      - sg-00d2c4745f1be413d
+    subnetIds:
+      - subnet-041a745abeb095909
+      - subnet-006197887293e153b
+      - subnet-057443930576afba8
 
 functions:
   app:
     name: ${self:service}-${opt:stage, self:provider.stage}-app
     image:
-      name: inventorymanagement
-      command: ["app.main.lambda_handler"]
+      name: inventory-management-backend
+      command: [ "app.main.lambda_handler" ]
+    memorySize: 1024  # Increased memory size
+    timeout: 30       # Increased timeout
     events:
       - http:
           path: /{proxy+}
